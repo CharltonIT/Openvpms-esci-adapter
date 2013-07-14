@@ -12,6 +12,8 @@
  *  License.
  *
  *  Copyright 2010 (C) OpenVPMS Ltd. All Rights Reserved.
+ *
+ *  $Id$
  */
 package org.openvpms.esci.adapter.dispatcher;
 
@@ -31,7 +33,8 @@ import javax.annotation.Resource;
 /**
  * Base class for listeners that create an <em>act.systemMessage</em> for the events they receive.
  *
- * @author Tim Anderson
+ * @author <a href="mailto:support@openvpms.org">OpenVPMS Team</a>
+ * @version $LastChangedDate: 2006-05-02 05:16:31Z $
  */
 public abstract class AbstractSystemMessageFactory {
 
@@ -62,17 +65,15 @@ public abstract class AbstractSystemMessageFactory {
      * The act's author is determined using {@link #getAddressee}.
      * If there is no author, no system message will be created.
      *
-     * @param act     the act
-     * @param subject the message subject
-     * @param reason  the reason
+     * @param act    the act
+     * @param reason the reason
      */
-    protected void createMessage(Act act, String subject, String reason) {
+    protected void createMessage(Act act, String reason) {
         User user = getAddressee(act, reason);
         if (user != null) {
             ActBean message = factory.createActBean(MessageArchetypes.SYSTEM);
             message.addNodeRelationship("item", act);
             message.addNodeParticipation("to", user);
-            message.setValue("description", subject);
             message.setValue("reason", reason);
             message.save();
         }
