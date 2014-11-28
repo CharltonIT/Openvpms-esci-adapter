@@ -499,7 +499,7 @@ public class OrderMapperImpl implements OrderMapper {
             customer = location;
         }
         Contact phoneContact = partyRules.getContact(customer, ContactArchetypes.PHONE, "BILLING");
-        Contact faxContact = partyRules.getContact(customer, ContactArchetypes.FAX, "BILLING");
+        Contact faxContact = partyRules.getContact(customer, ContactArchetypes.PHONE, "FAX");
         Contact emailContact = partyRules.getContact(customer, ContactArchetypes.EMAIL, "BILLING");
 
         CustomerAssignedAccountIDType customerId
@@ -590,7 +590,7 @@ public class OrderMapperImpl implements OrderMapper {
     }
 
     /**
-     * Returns an <tt>TelefaxType</tt> for a <em>contact.faxNumber</em>.
+     * Returns an <tt>TelefaxType</tt> for a <em>contact.phoneNumber</em>.
      *
      * @param contact the fax contact. May be <tt>null</tt>
      * @return a new <tt>TelefaxType</tt> or <tt>null</tt> if <tt>contact</tt> is null or unpopulated
