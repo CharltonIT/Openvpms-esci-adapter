@@ -29,6 +29,7 @@ import org.openvpms.archetype.rules.supplier.SupplierRules;
 import org.openvpms.archetype.test.TestHelper;
 import org.openvpms.component.business.domain.im.act.FinancialAct;
 import org.openvpms.component.business.domain.im.common.EntityRelationship;
+import org.openvpms.component.business.domain.im.lookup.Lookup;
 import org.openvpms.component.business.domain.im.party.Contact;
 import org.openvpms.component.business.domain.im.party.Party;
 import org.openvpms.component.business.domain.im.product.Product;
@@ -46,14 +47,7 @@ import org.openvpms.esci.adapter.util.ESCIAdapterException;
 import org.openvpms.esci.ubl.common.AmountType;
 import org.openvpms.esci.ubl.common.IdentifierType;
 import org.openvpms.esci.ubl.common.QuantityType;
-import org.openvpms.esci.ubl.common.aggregate.AddressType;
-import org.openvpms.esci.ubl.common.aggregate.ContactType;
-import org.openvpms.esci.ubl.common.aggregate.CustomerPartyType;
-import org.openvpms.esci.ubl.common.aggregate.ItemType;
-import org.openvpms.esci.ubl.common.aggregate.LineItemType;
-import org.openvpms.esci.ubl.common.aggregate.OrderLineType;
-import org.openvpms.esci.ubl.common.aggregate.PartyType;
-import org.openvpms.esci.ubl.common.aggregate.SupplierPartyType;
+import org.openvpms.esci.ubl.common.aggregate.*;
 import org.openvpms.esci.ubl.common.basic.PayableAmountType;
 import org.openvpms.esci.ubl.io.UBLDocumentContext;
 import org.openvpms.esci.ubl.io.UBLDocumentWriter;
@@ -65,9 +59,7 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 
 /**
@@ -293,8 +285,8 @@ public class OrderMapperTestCase extends AbstractESCITest {
 
         phoneContact = createContact(ContactArchetypes.PHONE, "telephoneNumber", "59527054");
         practice.addContact(phoneContact);
-
-        faxContact = createContact(ContactArchetypes.FAX, "faxNumber", "59527053");
+        faxContact = createContact(ContactArchetypes.PHONE, "telephoneNumber", "59527053");
+        faxContact.addClassification(getContactPurpose("FAX"));
         practice.addContact(faxContact);
 
         emailContact = createContact(ContactArchetypes.EMAIL, "emailAddress", "foo@bar.com");
@@ -383,8 +375,18 @@ public class OrderMapperTestCase extends AbstractESCITest {
                               Contact emailContact) {
         assertEquals(name, contact.getName().getValue());
         assertEquals(phoneContact.getDetails().get("telephoneNumber"), contact.getTelephone().getValue());
-        assertEquals(faxContact.getDetails().get("faxNumber"), contact.getTelefax().getValue());
+        assertEquals(faxContact.getDetails().get("telephoneNumber"), contact.getTelefax().getValue());
         assertEquals(emailContact.getDetails().get("emailAddress"), contact.getElectronicMail().getValue());
+    }
+    /**
+     * Gets an <em>lookup.contactPurpose</em> lookup, creating it if it
+     * doesn't exist.
+     *
+     * @param purpose the purpose
+     * @return the lookup
+     */
+    private Lookup getContactPurpose(String purpose) {
+        return TestHelper.getLookup(ContactArchetypes.PURPOSE, purpose);
     }
 
     /**

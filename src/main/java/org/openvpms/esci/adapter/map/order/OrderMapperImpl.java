@@ -44,45 +44,8 @@ import org.openvpms.component.business.service.lookup.ILookupService;
 import org.openvpms.esci.adapter.i18n.ESCIAdapterMessages;
 import org.openvpms.esci.adapter.map.UBLHelper;
 import org.openvpms.esci.adapter.util.ESCIAdapterException;
-import org.openvpms.esci.ubl.common.aggregate.AddressLineType;
-import org.openvpms.esci.ubl.common.aggregate.AddressType;
-import org.openvpms.esci.ubl.common.aggregate.ContactType;
-import org.openvpms.esci.ubl.common.aggregate.CustomerPartyType;
-import org.openvpms.esci.ubl.common.aggregate.ItemIdentificationType;
-import org.openvpms.esci.ubl.common.aggregate.ItemType;
-import org.openvpms.esci.ubl.common.aggregate.LineItemType;
-import org.openvpms.esci.ubl.common.aggregate.MonetaryTotalType;
-import org.openvpms.esci.ubl.common.aggregate.OrderLineType;
-import org.openvpms.esci.ubl.common.aggregate.PartyNameType;
-import org.openvpms.esci.ubl.common.aggregate.PartyType;
-import org.openvpms.esci.ubl.common.aggregate.PriceType;
-import org.openvpms.esci.ubl.common.aggregate.SupplierPartyType;
-import org.openvpms.esci.ubl.common.aggregate.TaxTotalType;
-import org.openvpms.esci.ubl.common.basic.BaseQuantityType;
-import org.openvpms.esci.ubl.common.basic.CityNameType;
-import org.openvpms.esci.ubl.common.basic.CopyIndicatorType;
-import org.openvpms.esci.ubl.common.basic.CountrySubentityType;
-import org.openvpms.esci.ubl.common.basic.CustomerAssignedAccountIDType;
-import org.openvpms.esci.ubl.common.basic.DescriptionType;
-import org.openvpms.esci.ubl.common.basic.ElectronicMailType;
-import org.openvpms.esci.ubl.common.basic.IDType;
-import org.openvpms.esci.ubl.common.basic.IssueDateType;
-import org.openvpms.esci.ubl.common.basic.IssueTimeType;
-import org.openvpms.esci.ubl.common.basic.LineExtensionAmountType;
-import org.openvpms.esci.ubl.common.basic.LineType;
-import org.openvpms.esci.ubl.common.basic.NameType;
-import org.openvpms.esci.ubl.common.basic.PackQuantityType;
-import org.openvpms.esci.ubl.common.basic.PackSizeNumericType;
-import org.openvpms.esci.ubl.common.basic.PayableAmountType;
-import org.openvpms.esci.ubl.common.basic.PostalZoneType;
-import org.openvpms.esci.ubl.common.basic.PriceAmountType;
-import org.openvpms.esci.ubl.common.basic.QuantityType;
-import org.openvpms.esci.ubl.common.basic.SupplierAssignedAccountIDType;
-import org.openvpms.esci.ubl.common.basic.TaxAmountType;
-import org.openvpms.esci.ubl.common.basic.TelefaxType;
-import org.openvpms.esci.ubl.common.basic.TelephoneType;
-import org.openvpms.esci.ubl.common.basic.TotalTaxAmountType;
-import org.openvpms.esci.ubl.common.basic.UBLVersionIDType;
+import org.openvpms.esci.ubl.common.aggregate.*;
+import org.openvpms.esci.ubl.common.basic.*;
 import org.openvpms.esci.ubl.order.Order;
 
 import javax.annotation.Resource;
@@ -184,7 +147,7 @@ public class OrderMapperImpl implements OrderMapper {
     }
 
     /**
-     * Registes the party rules.
+     * Registers the party rules.
      *
      * @param rules the party rules
      */
@@ -499,7 +462,10 @@ public class OrderMapperImpl implements OrderMapper {
             customer = location;
         }
         Contact phoneContact = partyRules.getContact(customer, ContactArchetypes.PHONE, "BILLING");
-        Contact faxContact = partyRules.getContact(customer, ContactArchetypes.PHONE, "FAX");
+        Contact faxContact = partyRules.getContact(customer, ContactArchetypes.PHONE, true, "FAX", "BILLING");
+        if(faxContact == null){
+            faxContact = partyRules.getContact(customer, ContactArchetypes.PHONE, true, "FAX");
+        }
         Contact emailContact = partyRules.getContact(customer, ContactArchetypes.EMAIL, "BILLING");
 
         CustomerAssignedAccountIDType customerId
@@ -590,13 +556,13 @@ public class OrderMapperImpl implements OrderMapper {
     }
 
     /**
-     * Returns an <tt>TelefaxType</tt> for a <em>contact.phoneNumber</em>.
+     * Returns an <tt>TelefaxType</tt> for a <em>contact.faxNumber</em>.
      *
      * @param contact the fax contact. May be <tt>null</tt>
      * @return a new <tt>TelefaxType</tt> or <tt>null</tt> if <tt>contact</tt> is null or unpopulated
      */
     private TelefaxType getFax(Contact contact) {
-        String fax = formatPhone(contact, "areaCode", "faxNumber");
+        String fax = formatPhone(contact, "areaCode", "telephoneNumber");
         return (fax != null) ? UBLHelper.initText(new TelefaxType(), fax) : null;
     }
 
